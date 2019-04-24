@@ -1,0 +1,17 @@
+<knowts>
+    <knowt>
+        <id>q01</id>
+        <quote>quote string 01</quote>
+        <ref>ref string 01</ref>
+    </knowt>
+    <knowt>
+        <id>q02</id>
+        <quote>quote string 02</quote>
+        <ref>ref string 02</ref>
+    </knowt>
+    <knowt>
+        <id>q03</id>
+        <quote>quote string 03</quote>
+        <ref>ref string 03</ref>
+    </knowt>
+</knowts>
