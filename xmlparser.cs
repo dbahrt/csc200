@@ -1,5 +1,5 @@
 // Dan Bahrt
-// Startup.cs
+// xmlparser.cs
 
 using System;
 using System.IO;
@@ -16,6 +16,13 @@ class Startup {
     private static string gDefType="knowt";
 
     //----------
+    // sample data for this program is included in
+    // the github/dbahrt/csc200 respository.
+    // must specify the name of an XML text file
+    // on the command line.  It's just a dummy file
+    // that you can use as a starting point:
+    // check out knowts.xml.
+    //----------
     public static int Main(string [] args) {
 
         if(args.Length!=1) {
@@ -25,9 +32,6 @@ class Startup {
             return FAIL;
         }
 
-        //----------
-        // just in case the specified XML file does not exist,
-        // try to premake an empty file.
         //----------
         string infilename = args[0];
         if(!File.Exists(infilename)) {
@@ -64,8 +68,6 @@ class Startup {
 
 
         //----------
-        // close the input file as we are all done with it
-        //----------
         infile.Close();
 
         if(result==XMLObject.ERROR) {
@@ -74,7 +76,6 @@ class Startup {
         } else if(result==XMLObject.FAIL) {
             return FAIL;
         }
-        // no news is good news...
         return SUCCESS;
     } // end Main() function
 
