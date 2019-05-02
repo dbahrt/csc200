@@ -1,6 +1,6 @@
 // filename: ta_testadmin.cs
 // author: Dan Bahrt
-// date: 30 April 2019
+// date: 2 May 2019
 
 using System;
 using System.IO;
@@ -63,12 +63,6 @@ Console.WriteLine(si.getEmailAddress());
 
         return;
     } // end function Main()
-
-    //----------
-    private static void setColors(ConsoleColor fg,ConsoleColor bg) {
-        Console.ForegroundColor=fg;
-        Console.BackgroundColor=bg;
-    }
 
 } // end class startup
 
@@ -496,7 +490,7 @@ public class Question {
 
     //----------
     public void drawQuestionBox() {
-        setColors(ConsoleColor.Yellow,ConsoleColor.Black);
+        Useful.setColors(ConsoleColor.Yellow,ConsoleColor.Black);
         for(int ii=0;ii<12;ii++) {
             Console.SetCursorPosition(xoff,yoff+ii);
             for(int jj=0;jj<maxcol;jj++) {
@@ -511,7 +505,7 @@ public class Question {
         DateTime starttime,int weight) {
 
         Console.SetCursorPosition(0,5);
-        setColors(ConsoleColor.White,ConsoleColor.Black);
+        Useful.setColors(ConsoleColor.White,ConsoleColor.Black);
         Console.Write("QUESTION #: "+(curq+1).ToString("D3")+"    ");
         Console.Write("ANSWERED: "+(maxq-unanswered).ToString("D3")+" of "+
             maxq.ToString("D3")+"    ");
@@ -555,40 +549,6 @@ public class Question {
         }
     }
 
-    //----------
-    private Char getKeyPress(out char key) {
-        ConsoleKeyInfo cki;
-        for(;;) {
-            cki = Console.ReadKey(true);
-            if((cki.KeyChar>=' ')&&(cki.KeyChar<='~')) {
-                key=(char)cki.Key;
-                return cki.KeyChar;
-            }
-            if((cki.KeyChar==8)||(cki.KeyChar==9)||(cki.KeyChar==10)) {
-                key=(char)cki.Key;
-                return cki.KeyChar;
-            }
-
-            if((cki.KeyChar==0)&&
-               ((cki.Key==ConsoleKey.Backspace)||
-                (cki.Key==ConsoleKey.LeftArrow)||
-                (cki.Key==ConsoleKey.RightArrow)||
-                (cki.Key==ConsoleKey.UpArrow)||
-                (cki.Key==ConsoleKey.DownArrow)||
-                (cki.Key==ConsoleKey.Insert)||
-                (cki.Key==ConsoleKey.Delete)||
-                (cki.Key==ConsoleKey.Tab))) {
-                key=(char)cki.Key;
-                return cki.KeyChar;
-            }
-        }
-    }
-
-    //----------
-    private void setColors(ConsoleColor fg,ConsoleColor bg) {
-        Console.ForegroundColor=fg;
-        Console.BackgroundColor=bg;
-    }
 
 } // end class Question
 
@@ -619,7 +579,7 @@ public class Response {
 
     //----------
     public void drawResponseBox() {
-        setColors(ConsoleColor.Black,ConsoleColor.White);
+        Useful.setColors(ConsoleColor.Black,ConsoleColor.White);
         for(int ii=0;ii<12;ii++) {
             Console.SetCursorPosition(xoff,yoff+ii);
             for(int jj=0;jj<maxcol;jj++) {
@@ -662,7 +622,7 @@ public class Response {
 
         char inpkey;
         for(;;) {
-            Char inpchr=getKeyPress(out inpkey);
+            Char inpchr=Useful.getKeyPress(out inpkey);
             if((inpchr>=' ')&&(inpchr<='~')) {
                 Console.Write(inpchr);
                 respbuf[respoff++]=inpchr;
@@ -799,40 +759,6 @@ public class Response {
         Console.SetCursorPosition(respoff%maxcol+xoff,respoff/maxcol+yoff);
     }
 
-    //----------
-    private Char getKeyPress(out char key) {
-        ConsoleKeyInfo cki;
-        for(;;) {
-            cki = Console.ReadKey(true);
-            if((cki.KeyChar>=' ')&&(cki.KeyChar<='~')) {
-                key=(char)cki.Key;
-                return cki.KeyChar;
-            }
-            if((cki.KeyChar==8)||(cki.KeyChar==9)||(cki.KeyChar==10)) {
-                key=(char)cki.Key;
-                return cki.KeyChar;
-            }
-
-            if((cki.KeyChar==0)&&
-               ((cki.Key==ConsoleKey.Backspace)||
-                (cki.Key==ConsoleKey.LeftArrow)||
-                (cki.Key==ConsoleKey.RightArrow)||
-                (cki.Key==ConsoleKey.UpArrow)||
-                (cki.Key==ConsoleKey.DownArrow)||
-                (cki.Key==ConsoleKey.Insert)||
-                (cki.Key==ConsoleKey.Delete)||
-                (cki.Key==ConsoleKey.Tab))) {
-                key=(char)cki.Key;
-                return cki.KeyChar;
-            }
-        }
-    }
-
-    //----------
-    private void setColors(ConsoleColor fg,ConsoleColor bg) {
-        Console.ForegroundColor=fg;
-        Console.BackgroundColor=bg;
-    }
 
 } // end class Response
 
