@@ -11,13 +11,6 @@ namespace ta {
 //==========
 public class startup {
 
-    // setup by readQuestions();
-    private static string [] quids;
-    private static int [] weights;
-    private static string [] questions;
-    private static string [] responses;
-    private static int maxq, unanswered;
-
     //----------
     public static void Main(string [] args) {
         if(Console.WindowWidth<80) {
@@ -41,119 +34,11 @@ Console.WriteLine("args[0]="+args[0]);
 
         DateTime starttime=DateTime.Now;
 
-        readQuestions(args[0]);
+        TestAdministrator.takeTest(si.getCourse()+"_"+si.getExamination(),si.getStudentName(),starttime);
 
-        Console.Clear();
-
-        Question qst=new Question(Console.WindowWidth-4,12,2,6);
-        Response rsp=new Response(Console.WindowWidth-4,12,2,18);
-
-        for(int curq=0;;) {
-            displayQuestion(curq,starttime,qst,rsp);
-
-            setColors(ConsoleColor.Green,ConsoleColor.Black);
-            clearLine(0);
-Console.Write("Navigate? ___      Specify QUESTION # or one of these one-letter commands: ");
-            clearLine(1);
-Console.Write("                   A)nswer_current  N)ext  P)rev  S)can_next_unanswered  D)one");
-
-            Console.SetCursorPosition(10,0);
-            string option=Console.ReadLine().Trim();
-            int optnum=0;
-            if(Int32.TryParse(option,out optnum)) {
-                if((optnum>maxq)||(optnum<1)) {
-                    Console.SetCursorPosition(0,3);
-                    Console.Write("Invalid input....  QUESTION # must be ");
-                    Console.WriteLine("between 1 and "+maxq+". Try again.");
-                    continue;
-                }
-
-                clearLine(3);
-
-                curq=optnum-1;
-                displayQuestion(curq,starttime,qst,rsp);
-    
-                continue;
-            } else {                
-
-                if((option=="")||(option.ToLower()=="a")) {
-                    clearLine(3);
-                    if(answerQuestion(curq,starttime,rsp)) {
-                        // response was changed
-                        // write changes out to disk
-                        WriteResponses(args[0]+"_"+si.getStudentName());
-                    }
-                } else if(option.ToLower()=="n") {
-                    clearLine(3);
-                    curq++;
-                    if(curq>=maxq) {
-                        curq=0;
-                    }
-                    displayQuestion(curq,starttime,qst,rsp);
-                } else if(option.ToLower()=="p") {
-                    clearLine(3);
-                    curq--;
-                    if(curq<0) {
-                        curq=maxq-1;
-                    }
-                    displayQuestion(curq,starttime,qst,rsp);
-                } else if(option.ToLower()=="s") {
-                    clearLine(3);
-                    if(unanswered==0) {
-                        Console.WriteLine("all questions have been answered.");
-                    } else {
-                        int end_search=curq;
-                        for(;;) {
-                            curq++;
-                            if(curq>=maxq) {
-                                curq=0;
-                            }
-                            if(curq==end_search) {
-                                Console.WriteLine("all questions appear to have been answered.");
-                                break;
-                            }
-                            if(responses[curq]=="") {
-                                break;
-                            }
-                        }
-                        displayQuestion(curq,starttime,qst,rsp);
-                    }   
-                } else if(option.ToLower()=="d") {
-                    Console.Clear();
-                    setColors(ConsoleColor.Green,ConsoleColor.Black);
-                    clearLine(0);
-                    Console.Write("All done?  ");
-                    clearLine(1);
-                    unanswered=0;
-                    for(int ii=0;ii<maxq;ii++) {
-                        if(responses[ii].Trim()=="") {
-                            unanswered++;
-                        }
-                    }
-                    if(unanswered==0) {
-                        Console.Write("All questions appear to have some kind of an answer.");
-                    } else {
-                        Console.Write("    UNANSWERED="+unanswered);
-                    }
-                    clearLine(2);
-                    Console.Write("Are you sure your want to leave ");
-                    Console.Write("this program at this time (YES|else)? ");
-                    if(Console.ReadLine()=="YES") {
-                        break;
-                    }
-                } else {
-                    clearLine(3);
-                    Console.Beep();
-                    Console.WriteLine("invalid command entered: "+option);
-                }
-                continue;
-            }
-
-        } // end for()
-
-        clearLine(7);
-Console.WriteLine("You will need to upload your responses file ");
-Console.WriteLine(args[0]+"_"+si.getStudentName()+".txt");
+        Useful.clearLine(5);
+Console.WriteLine("You will need to upload your responses file (");
+Console.WriteLine(si.getCourse()+"_"+si.getExamination()+"_"+si.getStudentName()+".txt)");
 Console.WriteLine("into the final exam dropbox ");
 Console.WriteLine("in the Moodle shell for our course."); 
 Console.WriteLine();
@@ -163,14 +48,189 @@ Console.WriteLine("problems in processing it. ");
 Console.WriteLine();
 Console.WriteLine("I have your email address as ");
 Console.WriteLine(si.getEmailAddress());
-        clearLine(20);
-        Console.ResetColor();
-        // setColors(ConsoleColor.Green,ConsoleColor.Black);
-        Console.WriteLine("Remember... This is where this program all began:");
-        Console.WriteLine("Hello World!");
-        Console.WriteLine("Goodbye cruel World...");
+        Useful.enterContinue();
+
+/*
+        Console.Clear();
+        // Console.ResetColor();
+        Useful.setColors(ConsoleColor.Green,ConsoleColor.Black);
+        for(int ii=0;ii<iterativeDevelopmentMessage.Length;ii++) {
+            Console.WriteLine(iterativeDevelopmentMessage[ii]);
+        }
+*/
+
+        Console.WriteLine();
+
         return;
     } // end function Main()
+
+    //----------
+    private static void setColors(ConsoleColor fg,ConsoleColor bg) {
+        Console.ForegroundColor=fg;
+        Console.BackgroundColor=bg;
+    }
+
+} // end class startup
+
+
+//==========
+public class TestAdministrator {
+
+    // setup by TestAdministrator();
+    private static string [] quids;
+    private static int [] weights;
+    private static string [] questions;
+    private static string [] responses;
+    private static int maxq, unanswered;
+
+    //----------
+    private static void initta() {
+        quids=new string[200];
+        weights=new int[200];
+        questions=new string[200];
+        responses=new string[200];
+        maxq=0;
+        unanswered=0;
+    } // end constructor TestAdministrator
+
+    //----------
+    public static void takeTest(string examname,string studentname,DateTime starttime) {
+        initta();
+        readQuestions(examname);
+
+        Console.Clear();
+
+        Question qst=new Question(Console.WindowWidth-4,12,2,6);
+        Response rsp=new Response(Console.WindowWidth-4,12,2,18);
+
+        for(int curq=0;;) {
+            displayQuestion(curq,starttime,qst,rsp);
+
+            int optnum;
+            string option=navbar(out optnum);
+
+            if((option=="")&&((optnum>=1)&&(optnum<=maxq))) {
+                curq=optnum-1;
+                displayQuestion(curq,starttime,qst,rsp);
+                continue;
+            }
+            if((option=="")||(option.ToLower()=="a")) {
+                if(answerQuestion(curq,starttime,rsp)) {
+                    // response was changed
+                    // write changes out to disk
+
+                    WriteResponses(examname+"_"+studentname);
+                }
+                continue;
+            }
+            if(option.ToLower()=="n") {
+                curq++;
+                if(curq>=maxq) {
+                    curq=0;
+                }
+                displayQuestion(curq,starttime,qst,rsp);
+                continue;
+            }
+            if(option.ToLower()=="p") {
+                curq--;
+                if(curq<0) {
+                    curq=maxq-1;
+                }
+                displayQuestion(curq,starttime,qst,rsp);
+                continue;
+            }
+            if(option.ToLower()=="s") {
+                if(unanswered==0) {
+                    Console.WriteLine("all questions have been answered.");
+                } else {
+                    int end_search=curq;
+                    for(;;) {
+                        curq++;
+                        if(curq>=maxq) {
+                            curq=0;
+                        }
+                        if(curq==end_search) {
+                            Console.WriteLine("all questions appear to have been answered.");
+                            break;
+                        }
+                        if(responses[curq]=="") {
+                            break;
+                        }
+                    }
+                    displayQuestion(curq,starttime,qst,rsp);
+                }   
+                continue;
+            }
+            if(option.ToLower()=="d") {
+                Console.Clear();
+                Useful.setColors(ConsoleColor.Green,ConsoleColor.Black);
+                Useful.clearLine(0);
+                Console.Write("All done?  ");
+                Useful.clearLine(1);
+                unanswered=0;
+                for(int ii=0;ii<maxq;ii++) {
+                    if(responses[ii].Trim()=="") {
+                        unanswered++;
+                    }
+                }
+                if(unanswered==0) {
+                    Console.Write("All questions appear to have some kind of an answer.");
+                } else {
+                    Console.Write("    UNANSWERED="+unanswered);
+                }
+                Useful.clearLine(2);
+                Console.Write("Are you sure your want to leave ");
+                Console.Write("this program at this time (YES|else)? ");
+                if(Console.ReadLine()=="YES") {
+                    break;
+                }
+                continue;
+            }
+
+        } // end for()
+    } // end method takeTest()
+
+    //----------
+    private static string navbar(out int qnum) {
+        for(;;) {
+            Useful.setColors(ConsoleColor.Green,ConsoleColor.Black);
+            Useful.clearLine(0);
+Console.Write("Navigate? ___      Specify QUESTION # or one of these one-letter commands: ");
+            Useful.clearLine(1);
+Console.Write("                   A)nswer_current  N)ext  P)rev  S)can_next_unanswered  D)one");
+
+            Console.SetCursorPosition(10,0);
+            string option=Console.ReadLine().Trim();
+            int optnum=0;
+            if(Int32.TryParse(option,out optnum)) {
+                if((optnum>=1)&&(optnum<=maxq)) {
+                    Useful.clearLine(3);
+                    qnum=optnum;
+                    return "";
+                }
+
+                Console.SetCursorPosition(0,3);
+                Console.Write("Invalid input....  QUESTION # must be ");
+                Console.WriteLine("between 1 and "+maxq+". Try again.");
+                continue;
+            }
+
+            if((option=="")||
+               (option.ToLower()=="a")||
+               (option.ToLower()=="n")||
+               (option.ToLower()=="p")||
+               (option.ToLower()=="s")||
+               (option.ToLower()=="d")) {
+                Useful.clearLine(3);
+                qnum=0;
+                return option.ToLower();
+            }
+            
+            Useful.clearLine(3);
+            Console.Beep();
+            Console.WriteLine("invalid command entered: "+option);
+        } // end for()
+    }
 
     //----------
     private static void displayQuestion(int curq,DateTime starttime,
@@ -200,32 +260,6 @@ Console.WriteLine(si.getEmailAddress());
         // response was changed
         return true;
     } 
-
-    //----------
-    private static void clearLine(int row) {
-        Console.SetCursorPosition(0,row);
-        int maxcol=Console.WindowWidth;
-        for(int ii=0;ii<maxcol;ii++) {
-            Console.Write(" ");
-        }
-        Console.SetCursorPosition(0,row);
-    }
-
-    //----------
-    private static void clearLines(int row,int count) {
-        Console.SetCursorPosition(0,row);
-        int maxcol=Console.WindowWidth*count;
-        for(int ii=0;ii<maxcol;ii++) {
-            Console.Write(" ");
-        }
-        Console.SetCursorPosition(0,row);
-    }
-
-    //----------
-    private static void setColors(ConsoleColor fg,ConsoleColor bg) {
-        Console.ForegroundColor=fg;
-        Console.BackgroundColor=bg;
-    }
 
     //----------
     private static void WriteResponses(string exam) {
@@ -262,15 +296,9 @@ Console.WriteLine(si.getEmailAddress());
         }
     } // end method WriteLine()
 
-
     private static bool EOFDetected=false;
     //----------
     private static void readQuestions(string exam) {
-        quids=new string[200];
-        weights=new int[200];
-        questions=new string[200];
-        responses=new string[200];
-        maxq=0;
 
         string questions_path = exam+"_questions.txt";
 
@@ -354,7 +382,7 @@ Console.WriteLine(si.getEmailAddress());
         return(temp.GetString(buf,0,bufptr));
     } // end method ReadLine()
 
-} // end class startup
+} // end class TestAdministrator
 
 
 //==========
