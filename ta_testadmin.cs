@@ -173,35 +173,6 @@ Console.WriteLine(si.getEmailAddress());
     } // end function Main()
 
     //----------
-    private static string getPromptedInput(int row,string prompt) {
-        string result="";
-        for(;;) {
-            clearLines(row,5);
-            Console.Write(prompt);
-            string temp=Console.ReadLine();
-            StringBuilder tempsb=new StringBuilder();
-            for(int ii=0;ii<temp.Length;ii++) {
-                if(temp[ii]==' ') {
-                    continue;
-                }
-                tempsb.Append(temp[ii]);
-            }
-            result=tempsb.ToString();
-            Console.WriteLine();
-            Console.WriteLine("    Here's what I got:  "+result);
-            Console.WriteLine();
-            Console.Write("        Is this correct (Y|else)? ");
-            temp=Console.ReadLine().ToLower();
-            if(temp=="y") {
-                clearLines(row,5);
-                Console.Write(prompt+result);
-                break;
-            }
-        }  
-        return result;
-    }
-
-    //----------
     private static void displayQuestion(int curq,DateTime starttime,
         Question qst,Response rsp) {
 
@@ -465,7 +436,7 @@ public class StudentInfo {
             }
         }  
         return result;
-    }
+    } // end method getPromptedInput()
 
 } // end class StudentInfo
 
