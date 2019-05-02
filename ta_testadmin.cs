@@ -34,28 +34,14 @@ public class startup {
         ConsoleColor origFGColor=Console.ForegroundColor;
         ConsoleColor origBGColor=Console.BackgroundColor;
 
-        DateTime starttime=DateTime.Now;
+        StudentInfo si=new StudentInfo();
+args[0]=si.getCourse()+"_"+si.getExamination();
 
 Console.WriteLine("args[0]="+args[0]);
+
+        DateTime starttime=DateTime.Now;
+
         readQuestions(args[0]);
-
-        setColors(ConsoleColor.Green,ConsoleColor.Black);
-        Console.Clear();
-        clearLine(0);
-Console.WriteLine("Greetings!  Before we get started...");
-Console.WriteLine("    I need to get a couple of pieces of information from you,");
-Console.WriteLine("    in order to process your examination.");
-
-        string studentname=getPromptedInput(4,
-            "What is your name (FirstLast, no spaces)?  ");
-
-        string emailaddress=getPromptedInput(6,
-            "What is your email address?  ");
-
-Console.WriteLine();
-Console.WriteLine();
-Console.Write("Press Enter to continue...");
-Console.ReadLine();
 
         Console.Clear();
 
@@ -95,7 +81,7 @@ Console.Write("                   A)nswer_current  N)ext  P)rev  S)can_next_unan
                     if(answerQuestion(curq,starttime,rsp)) {
                         // response was changed
                         // write changes out to disk
-                        WriteResponses(args[0]+"_"+studentname);
+                        WriteResponses(args[0]+"_"+si.getStudentName());
                     }
                 } else if(option.ToLower()=="n") {
                     clearLine(3);
@@ -167,7 +153,7 @@ Console.Write("                   A)nswer_current  N)ext  P)rev  S)can_next_unan
 
         clearLine(7);
 Console.WriteLine("You will need to upload your responses file ");
-Console.WriteLine(args[0]+"_"+studentname+".txt");
+Console.WriteLine(args[0]+"_"+si.getStudentName()+".txt");
 Console.WriteLine("into the final exam dropbox ");
 Console.WriteLine("in the Moodle shell for our course."); 
 Console.WriteLine();
@@ -176,7 +162,7 @@ Console.WriteLine("a backup copy of that file, just in case I encounter");
 Console.WriteLine("problems in processing it. "); 
 Console.WriteLine();
 Console.WriteLine("I have your email address as ");
-Console.WriteLine(emailaddress);
+Console.WriteLine(si.getEmailAddress());
         clearLine(20);
         Console.ResetColor();
         // setColors(ConsoleColor.Green,ConsoleColor.Black);
@@ -398,6 +384,90 @@ Console.WriteLine(emailaddress);
     } // end method ReadLine()
 
 } // end class startup
+
+
+//==========
+public class StudentInfo {
+    private string studentname;
+    private string emailaddress;
+    private string course;
+    private string examination;
+
+    //----------
+    public StudentInfo() {
+        Useful.setColors(ConsoleColor.Green,ConsoleColor.Black);
+        Console.Clear();
+        Useful.clearLine(0);
+        Console.WriteLine("Greetings!  Before we get started...");
+        Console.WriteLine("    I need to get a couple of pieces of information from you,");
+        Console.WriteLine("    in order to process your examination.");
+
+        studentname=getPromptedInput(4,
+            "What is your name (FirstLast, no spaces)?  ");
+
+        course=getPromptedInput(6,
+            "What course are you taking (csc999, no spaces)?  ");
+
+        examination=getPromptedInput(8,
+            "What examination are you taking (midterm or final)?  ");
+
+        emailaddress=getPromptedInput(10,
+            "What is your email address?  ");
+
+        Console.WriteLine();
+        Useful.enterContinue();
+    } // end constructor StudentInfo()
+
+    //----------
+    public string getStudentName() { 
+        return studentname;
+    } 
+
+    //----------
+    public string getEmailAddress() {
+        return emailaddress;
+    }
+
+    //----------
+    public string getCourse() {
+        return course;
+    }
+
+    //----------
+    public string getExamination() {
+        return examination;
+    }
+
+    //----------
+    private static string getPromptedInput(int row,string prompt) {
+        string result="";
+        for(;;) {
+            Useful.clearLines(row,5);
+            Console.Write(prompt);
+            string temp=Console.ReadLine();
+            StringBuilder tempsb=new StringBuilder();
+            for(int ii=0;ii<temp.Length;ii++) {
+                if(temp[ii]==' ') {
+                    continue;
+                }
+                tempsb.Append(temp[ii]);
+            }
+            result=tempsb.ToString();
+            Console.WriteLine();
+            Console.WriteLine("    Here's what I got:  "+result);
+            Console.WriteLine();
+            Console.Write("        Is this correct (y|else)? ");
+            temp=Console.ReadLine().ToLower();
+            if(temp=="y") {
+                Useful.clearLines(row,5);
+                Console.Write(prompt+result);
+                break;
+            }
+        }  
+        return result;
+    }
+
+} // end class StudentInfo
 
 
 //==========
@@ -766,5 +836,91 @@ public class Response {
     }
 
 } // end class Response
+
+
+//==========
+class Useful {
+
+    //----------
+    public static void setColors(ConsoleColor fg,ConsoleColor bg) {
+        Console.ForegroundColor=fg;
+        Console.BackgroundColor=bg;
+    }
+
+    //----------
+    public static void clearLine(int row) {
+        clearLines(row,1);
+    }
+
+    //----------
+    public static void clearLines(int row,int count) {
+        Console.SetCursorPosition(0,row);
+        int maxcol=Console.WindowWidth*count;
+        for(int ii=0;ii<maxcol;ii++) {
+            Console.Write(" ");
+        }
+        Console.SetCursorPosition(0,row);
+    }
+
+    //----------
+    public static Char getKeyPress(out char key) {
+        ConsoleKeyInfo cki;
+        for(;;) {
+            cki = Console.ReadKey(true);
+            if((cki.KeyChar>=' ')&&(cki.KeyChar<='~')) {
+                key=(char)cki.Key;
+                return cki.KeyChar;
+            }
+            if((cki.KeyChar==8)||(cki.KeyChar==9)||(cki.KeyChar==10)) {
+                key=(char)cki.Key;
+                return cki.KeyChar;
+            }
+
+            if((cki.KeyChar==0)&&
+               ((cki.Key==ConsoleKey.Backspace)||
+                (cki.Key==ConsoleKey.LeftArrow)||
+                (cki.Key==ConsoleKey.RightArrow)||
+                (cki.Key==ConsoleKey.UpArrow)||
+                (cki.Key==ConsoleKey.DownArrow)||
+                (cki.Key==ConsoleKey.Insert)||
+                (cki.Key==ConsoleKey.Delete)||
+                (cki.Key==ConsoleKey.Tab))) {
+                key=(char)cki.Key;
+                return cki.KeyChar;
+            }
+        }
+    }
+
+    //----------
+    public static void enterContinue() {
+        Console.WriteLine();
+        Console.Write("Press Enter to continue...");
+        Console.ReadLine();
+    }
+
+    //----------
+    public static void dbg(string msg) {
+        FileStream fs;
+
+        try {
+            fs=new FileStream("dbg.txt",FileMode.Append,FileAccess.Write);
+        } catch(Exception) {
+            Console.WriteLine("unable to open file: "+"dbg.txt"); 
+            throw;
+        }
+        
+        byte[] info = new UTF8Encoding(true).GetBytes(msg+"\r\n");
+        try {
+            fs.Write(info, 0, info.Length);
+        } catch(Exception) {
+            Console.WriteLine("unable to write to file: dbg.txt"); 
+            throw;
+        }
+
+        fs.Close();
+    } // end method WriteResponses()
+
+
+} // end class Useful
 
 } // end namespace ta
