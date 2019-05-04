@@ -1,10 +1,11 @@
 // filename: ta_testadmin.cs
 // author: Dan Bahrt
-// date: 3 May 2019
+// date: 4 May 2019
 
 using System;
 using System.IO;
 using System.Text;
+using System.Collections.Generic;
 
 namespace ta {
 
@@ -22,6 +23,7 @@ public class startup {
                 " by "+Console.WindowHeight+") which is too small. ");
             Console.Write("Please resize this window, before attempting to ");
             Console.WriteLine("re-run this program.\n");
+            Useful.enterContinue();
             return;
         }
         ConsoleColor origFGColor=Console.ForegroundColor;
@@ -30,6 +32,32 @@ public class startup {
         StudentInfo si=new StudentInfo();
 
         DateTime starttime=DateTime.Now;
+        if(!File.Exists(si.getCourse()+"_"+si.getExamination()+"_questions.txt")) {
+            Console.WriteLine("\nfile not found: "+si.getCourse()+"_"+si.getExamination()+"_questions.txt");
+
+            Console.WriteLine("\nThis program requires that a text data file containing ");
+            Console.WriteLine("the test questions be placed in the local directory from ");
+            Console.WriteLine("whence this program is executed.  You can download this ");
+            Console.WriteLine("data file from the Exam Assignment in our Moodle course ");
+            Console.WriteLine("shell.");
+            Console.WriteLine("\nThe information that you just provided ");
+            Console.WriteLine("(YourName, the course name, and the exam type) ");
+            Console.WriteLine("are all used to locate the files used by the program.  ");
+            Console.WriteLine("If you did not copy the data file into the directory,  ");
+            Console.WriteLine("or if you entered an invalid course name, or an invalid ");
+            Console.WriteLine("exam type (which are parts of the text data file name), ");
+            Console.WriteLine("you will see this error message and be given an opportunity ");
+            Console.WriteLine("to restart the program.");
+            Console.WriteLine("\nAlso be aware that this program produces a text file ");
+            Console.WriteLine("(which includes YourName) containing your responses to the ");
+            Console.WriteLine("test questions. Theoretically, your responses should be ");
+            Console.WriteLine("preserved across multiple runs of the program. ");
+            Console.WriteLine("Still you need to check your work, and maybe even re-enter ");
+            Console.WriteLine("some of your responses, because.... No guarantees! ");
+            Console.WriteLine();
+            Useful.enterContinue();
+            return;
+        }
 
         TestAdministrator.takeTest(si.getCourse()+"_"+si.getExamination(),si.getStudentName(),starttime);
 
@@ -42,8 +70,6 @@ Console.WriteLine("It would also be a very good idea for you to keep ");
 Console.WriteLine("a backup copy of that file, just in case I encounter "); 
 Console.WriteLine("problems in processing it. "); 
 Console.WriteLine();
-Console.Write("I have your email address as: ");
-Console.WriteLine(si.getEmailAddress());
         Useful.enterContinue();
 
 /*
@@ -134,7 +160,9 @@ public class TestAdministrator {
     //----------
     public static void takeTest(string examname,string studentname,DateTime starttime) {
         initta();
-        readQuestions(examname);
+
+        readQuestions(examname+"_questions.txt");
+        ReadResponses(examname+"_"+studentname+".txt");
 
         Console.Clear();
 
@@ -157,7 +185,7 @@ public class TestAdministrator {
                     // response was changed
                     // write changes out to disk
 
-                    WriteResponses(examname+"_"+studentname);
+                    WriteResponses(examname+"_"+studentname+".txt");
                 }
                 continue;
             }
@@ -300,125 +328,79 @@ Console.Write("                   A)nswer_current  N)ext  P)rev  S)can_next_unan
     } 
 
     //----------
-    private static void WriteResponses(string exam) {
-        string responses_path = exam+".txt";
-
-        if (File.Exists(responses_path)) {
-            File.Delete(responses_path);
+    private static void ReadResponses(string filepath) {
+        if(!File.Exists(filepath)) {
+            for(int ii=0;ii<maxq;ii++) {
+                responses[ii]="";
+            } 
+            unanswered=maxq;
+            WriteResponses(filepath);
+            return;
         }
 
-        FileStream fs;
+        string[] inlines=File.ReadAllLines(filepath);
 
-        try {
-            fs=new FileStream(responses_path,FileMode.Create,FileAccess.Write);
-        } catch(Exception) {
-            Console.WriteLine("unable to create file: "+responses_path); 
-            throw;
+        unanswered=maxq;
+        int tmpoff=0;
+        for(int ii=0;ii<inlines.Length;ii++) {
+            string inplin=inlines[ii];
+            if(inplin=="") { continue; }
+            int off=inplin.IndexOf(", ");
+            if(off<=0) {
+                continue;
+            }
+            quids[tmpoff]=inplin.Substring(0,off);
+            inplin=inplin.Substring(off+2).Trim();
+
+            responses[tmpoff++]=inplin;
+            if(inplin!="") {
+                unanswered--;
+            }
+            if(tmpoff>=200) { break; }
         }
-        
+    } // end method ReadResponses()
+
+    //----------
+    private static void WriteResponses(string filepath) {
+        List<string> outlines=new List<string>();
         for(int ii=0;ii<maxq;ii++) {
-            WriteLine(fs,quids[ii]+"  "+responses[ii]);
+            outlines.Add(quids[ii]+", "+responses[ii]);
         }
 
-        fs.Close();
+        File.WriteAllLines(filepath,outlines);
     } // end method WriteResponses()
 
     //----------
-    private static void WriteLine(FileStream fs, string value) {
-        byte[] info = new UTF8Encoding(true).GetBytes(value+"\r\n");
-        try {
-            fs.Write(info, 0, info.Length);
-        } catch(Exception) {
-            Console.WriteLine("unable to write to file: "); 
-            throw;
-        }
-    } // end method WriteLine()
+    private static void readQuestions(string filepath) {
+        string[] inlines=File.ReadAllLines(filepath);
 
-    private static bool EOFDetected=false;
-    //----------
-    private static void readQuestions(string exam) {
-
-        string questions_path = exam+"_questions.txt";
-
-        FileStream fs;
-
-        try {
-            fs=new FileStream(questions_path,FileMode.Open,FileAccess.Read);
-        } catch(Exception) {
-            Console.WriteLine("unable to open file: "+questions_path); 
-            throw;
-        }
-
-        EOFDetected=false;
+        string col1,col2,col3;
         maxq=0;
-        for(;;) {
-            string inplin=ReadLine(fs);
-            if(inplin==null) {
-                break;
-            }
+        for(int ii=0;ii<inlines.Length;ii++) {
+            string inplin=inlines[ii];
             if(inplin=="") { continue; }
-            int off=inplin.IndexOf("  ");
-            if(off>0) {
-                quids[maxq]=inplin.Substring(0,off);
-                inplin=inplin.Substring(off).Trim();
-            } else {
-                quids[maxq]="";
-            }
-
-            off=inplin.IndexOf("  ");
-            if(off>0) {
-                string temp=inplin.Substring(0,off);
-                inplin=inplin.Substring(off).Trim();
-                if(!Int32.TryParse(temp,out weights[maxq])) {
-                    weights[maxq]=1;
-                }
-            } else {
-                weights[maxq]=1;
-            }
-                
-            questions[maxq++]=inplin;
-            if(maxq>=200) { break; }
-        }
-
-        fs.Close();
-
-        for(int ii=0;ii<maxq;ii++) {
-            responses[ii]="";
-        } 
-        unanswered=maxq;
-
-    } // end method readQuestions()
-
-    //----------
-    // we are reading lines one-by-one.
-    //----------
-    private static string ReadLine(FileStream fs) {
-        if(EOFDetected) {
-            return null;
-        }
-
-        // TODO: rewrite this function to allow for arbitrarily long lines
-        byte[] buf = new byte[1024576];
-        int bufptr = 0;
-
-        int inchr;
-        for(;;) {
-            inchr=fs.ReadByte();
-            if(inchr==-1) {
-                EOFDetected=true;
-                break;
-            }
-            if(inchr==10) {
-                break;
-            }
-            if(inchr==13) {
+            int off=inplin.IndexOf(", ");
+            if(off<=0) {
                 continue;
             }
-            buf[bufptr++]=(byte)inchr;
+            col1=inplin.Substring(0,off);
+            inplin=inplin.Substring(off+2).Trim(); 
+            off=inplin.IndexOf(", ");
+            if(off<=0) {
+                continue;
+            }
+            col2=inplin.Substring(0,off);
+            inplin=inplin.Substring(off+2).Trim();
+            col3=inplin;
+            if(!Int32.TryParse(col2,out weights[maxq])) {
+                continue;
+            }
+                
+            quids[maxq]=col1;
+            questions[maxq++]=col3;
+            if(maxq>=200) { break; }
         }
-        UTF8Encoding temp = new UTF8Encoding(true);
-        return(temp.GetString(buf,0,bufptr));
-    } // end method ReadLine()
+    } // end method readQuestions()
 
 } // end class TestAdministrator
 
@@ -426,7 +408,6 @@ Console.Write("                   A)nswer_current  N)ext  P)rev  S)can_next_unan
 //==========
 public class StudentInfo {
     private string studentname;
-    private string emailaddress;
     private string course;
     private string examination;
 
@@ -448,9 +429,6 @@ public class StudentInfo {
         examination=getPromptedInput(8,
             "What examination are you taking (midterm or final)?  ");
 
-        emailaddress=getPromptedInput(10,
-            "What is your email address?  ");
-
         Console.WriteLine();
         Useful.enterContinue();
     } // end constructor StudentInfo()
@@ -459,11 +437,6 @@ public class StudentInfo {
     public string getStudentName() { 
         return studentname;
     } 
-
-    //----------
-    public string getEmailAddress() {
-        return emailaddress;
-    }
 
     //----------
     public string getCourse() {
@@ -622,7 +595,7 @@ public class Response {
 
     //----------
     public void drawResponseBox() {
-Useful.dbg("drawResponseBox():  xoff="+xoff+"  yoff="+yoff);
+// Useful.dbg("drawResponseBox():  xoff="+xoff+"  yoff="+yoff);
         Useful.setColors(ConsoleColor.Black,ConsoleColor.White);
         for(int ii=0;ii<12;ii++) {
             Console.SetCursorPosition(xoff,yoff+ii);
@@ -887,7 +860,7 @@ class Useful {
         }
 
         fs.Close();
-    } // end method WriteResponses()
+    } // end method dbg()
 
 
 } // end class Useful
