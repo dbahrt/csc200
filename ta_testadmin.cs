@@ -1,6 +1,6 @@
 // filename: ta_testadmin.cs
 // author: Dan Bahrt
-// date: 2 May 2019
+// date: 3 May 2019
 
 using System;
 using System.IO;
@@ -28,25 +28,21 @@ public class startup {
         ConsoleColor origBGColor=Console.BackgroundColor;
 
         StudentInfo si=new StudentInfo();
-args[0]=si.getCourse()+"_"+si.getExamination();
-
-Console.WriteLine("args[0]="+args[0]);
 
         DateTime starttime=DateTime.Now;
 
         TestAdministrator.takeTest(si.getCourse()+"_"+si.getExamination(),si.getStudentName(),starttime);
 
         Useful.clearLine(5);
-Console.WriteLine("You will need to upload your responses file (");
-Console.WriteLine(si.getCourse()+"_"+si.getExamination()+"_"+si.getStudentName()+".txt)");
-Console.WriteLine("into the final exam dropbox ");
-Console.WriteLine("in the Moodle shell for our course."); 
+Console.WriteLine("You will need to upload your responses file ");
+Console.WriteLine("("+si.getCourse()+"_"+si.getExamination()+"_"+si.getStudentName()+".txt)");
+Console.WriteLine("into the final exam dropbox in the Moodle shell for our course."); 
 Console.WriteLine();
-Console.WriteLine("It would also be a very good idea for you to keep"); 
-Console.WriteLine("a backup copy of that file, just in case I encounter"); 
+Console.WriteLine("It would also be a very good idea for you to keep "); 
+Console.WriteLine("a backup copy of that file, just in case I encounter "); 
 Console.WriteLine("problems in processing it. "); 
 Console.WriteLine();
-Console.WriteLine("I have your email address as ");
+Console.Write("I have your email address as: ");
 Console.WriteLine(si.getEmailAddress());
         Useful.enterContinue();
 
@@ -63,6 +59,54 @@ Console.WriteLine(si.getEmailAddress());
 
         return;
     } // end function Main()
+
+    //----------
+    private static string [] iterativeDevelopmentMessage = {
+        "And now I'd like to preach a bit about a couple of Computer Science topics: ",
+        "I want you all to take note and remember... ",
+        "",
+        "This examination program started with the following sample program:",
+        "",
+        "    Hello World!",
+        "    Goodbye cruel World...",
+        "",
+        "and from thence it grew iteratively, step-by-step, over a period of a couple ",
+        "of weeks. At no point did I try to work with any large block of questionably ",
+        "functional code, and I always kept a known-working fallback version of the ",
+        "program so that I could revert to in case some provisional block of code ",
+        "failed miserably. I know it seems slow and tedious, but this approach will ",
+        "save you more time than you can imagine. Debugging a large block of buggy ",
+        "code can take a very long time. ",
+        "",
+        "To those students who felt that we did not do enough actual programming in ",
+        "this class, I would encourage you to adjust your notion of what constitutes ",
+        "effective programming. ",
+        "",
+        "A mature programming process is more about becoming famialiar with ",
+        "pre-existing code, reading it and figuring out what it does, documenting it, ",
+        "fixing it (if necessary), organizing it, refactoring it, and synthesizing new ",
+        "solutions than it is about simply writing your own code. ",
+        "",
+        "Just because you wrote it does not automatically make it better, ",
+        "more familiar perhaps, but that advantage can easily slip away simply by ",
+        "walking away from your code for a short while.  Then you slip into the mode ",
+        "of becoming familiar with your own pre-existing code, reading your own code ",
+        "and figuring out what it does.... ",
+        "",
+        "While I was developing this examination program, many times I incorporated ",
+        "entire chunks of working code from my personal ",
+        "portfolio of sample programs. You remember that FileStream example program ",
+        "that I distributed and discussed during the second week of class? I copied ",
+        "that almost verbatim into this program.  Other times I wrote small snippets ",
+        "of original code (I guess you could call them sample programs), working with ",
+        "and debugging them until they performed as needed... and then I incorporated ",
+        "into this examination program.",
+        "",
+        "Eventually, the program grew into a substantial 800+ line application ",
+        "program. It's not finished yet. It may never be completely finished, but ",
+        "that's a quality of a good program. It can grow as the developer's ",
+        "understanding of the problem grows. But already it has been useful, and it ",
+        "shows substantial promise.  The semi-automated grading program comes next. "};
 
 } // end class startup
 
@@ -549,7 +593,6 @@ public class Question {
         }
     }
 
-
 } // end class Question
 
 //==========
@@ -579,6 +622,7 @@ public class Response {
 
     //----------
     public void drawResponseBox() {
+Useful.dbg("drawResponseBox():  xoff="+xoff+"  yoff="+yoff);
         Useful.setColors(ConsoleColor.Black,ConsoleColor.White);
         for(int ii=0;ii<12;ii++) {
             Console.SetCursorPosition(xoff,yoff+ii);
