@@ -1,90 +1,125 @@
 // filename: ta_testadmin.cs
 // author: Dan Bahrt
-// date: 4 May 2019
+// date: 5 May 2019
 
 using System;
 using System.IO;
 using System.Text;
 using System.Collections.Generic;
 
+//345678901234567890123456789012345678901234567890123456789012345678901234567890
 namespace ta {
 
 //==========
 public class startup {
+    private static StudentInfo si;
 
     //----------
     public static void Main(string [] args) {
-        if(Console.WindowWidth<80) {
-            Console.Write("This program requires that the Console Window ");
-            Console.Write("Size must be ");
-            Console.WriteLine();
-            Console.Write("at least (80 columns by 30 rows). ");
-            Console.Write("Presently, it is ("+Console.WindowWidth+
-                " by "+Console.WindowHeight+") which is too small. ");
-            Console.Write("Please resize this window, before attempting to ");
-            Console.WriteLine("re-run this program.\n");
-            Useful.enterContinue();
+        if((Console.WindowWidth<80)||(Console.WindowHeight<30)) {
+            dumpScreenSizeInstructions();
             return;
         }
         ConsoleColor origFGColor=Console.ForegroundColor;
         ConsoleColor origBGColor=Console.BackgroundColor;
 
-        StudentInfo si=new StudentInfo();
+        si=new StudentInfo();
 
         DateTime starttime=DateTime.Now;
         if(!File.Exists(si.getCourse()+"_"+si.getExamination()+"_questions.txt")) {
-            Console.WriteLine("\nfile not found: "+si.getCourse()+"_"+si.getExamination()+"_questions.txt");
+            dumpAdmissionInstructions();
 
-            Console.WriteLine("\nThis program requires that a text data file containing ");
-            Console.WriteLine("the test questions be placed in the local directory from ");
-            Console.WriteLine("whence this program is executed.  You can download this ");
-            Console.WriteLine("data file from the Exam Assignment in our Moodle course ");
-            Console.WriteLine("shell.");
-            Console.WriteLine("\nThe information that you just provided ");
-            Console.WriteLine("(YourName, the course name, and the exam type) ");
-            Console.WriteLine("are all used to locate the files used by the program.  ");
-            Console.WriteLine("If you did not copy the data file into the directory,  ");
-            Console.WriteLine("or if you entered an invalid course name, or an invalid ");
-            Console.WriteLine("exam type (which are parts of the text data file name), ");
-            Console.WriteLine("you will see this error message and be given an opportunity ");
-            Console.WriteLine("to restart the program.");
-            Console.WriteLine("\nAlso be aware that this program produces a text file ");
-            Console.WriteLine("(which includes YourName) containing your responses to the ");
-            Console.WriteLine("test questions. Theoretically, your responses should be ");
-            Console.WriteLine("preserved across multiple runs of the program. ");
-            Console.WriteLine("Still you need to check your work, and maybe even re-enter ");
-            Console.WriteLine("some of your responses, because.... No guarantees! ");
-            Console.WriteLine();
-            Useful.enterContinue();
             return;
         }
 
-        TestAdministrator.takeTest(si.getCourse()+"_"+si.getExamination(),si.getStudentName(),starttime);
+        TestAdministrator.takeTest(si.getCourse()+"_"+si.getExamination(),
+            si.getStudentName(),starttime);
 
-        Useful.clearLine(5);
-Console.WriteLine("You will need to upload your responses file ");
-Console.WriteLine("("+si.getCourse()+"_"+si.getExamination()+"_"+si.getStudentName()+".txt)");
-Console.WriteLine("into the final exam dropbox in the Moodle shell for our course."); 
-Console.WriteLine();
-Console.WriteLine("It would also be a very good idea for you to keep "); 
-Console.WriteLine("a backup copy of that file, just in case I encounter "); 
-Console.WriteLine("problems in processing it. "); 
-Console.WriteLine();
+        dumpReleaseInstructions();
+
+        // dumpIterativeDevelopmentMessage();
+
+        Console.WriteLine();
+
+        return;
+    } // end function Main()
+
+    //----------
+    private static void dumpScreenSizeInstructions() {
+        Console.WriteLine("This program requires that the Console Window Size ");
+        Console.WriteLine("must be at least (80 columns by 30 rows). ");
+
+        Console.Write("\nPresently, it is ("+Console.WindowWidth+" by ");
+        Console.WriteLine(Console.WindowHeight+") which is too small. ");
+
+        Console.Write("\nPlease resize this window, before attempting to ");
+        Console.WriteLine("re-run this program.");
+        Console.WriteLine();
         Useful.enterContinue();
+    }
 
-/*
+    //----------
+    private static void dumpAdmissionInstructions() {
+        Console.Clear();
+        // Console.ResetColor();
+        Useful.setColors(ConsoleColor.Green,ConsoleColor.Black);
+
+        Console.Write("\nfile not found: ");
+        Console.WriteLine(si.getCourse()+"_"+si.getExamination()+"_questions.txt");
+
+        Console.WriteLine("\nThis program requires that a text data file containing ");
+        Console.WriteLine("the test questions be placed in the local directory from ");
+        Console.WriteLine("whence this program is executed.  You can download this ");
+        Console.WriteLine("data file from the Exam Assignment in our Moodle course ");
+        Console.WriteLine("shell.");
+
+        Console.WriteLine("\nThe information that you just provided ");
+        Console.WriteLine("(YourName, the course name, and the exam type) ");
+        Console.WriteLine("are all used to locate the files used by the program.  ");
+        Console.WriteLine("If you did not copy the data file into the directory,  ");
+        Console.WriteLine("or if you entered an invalid course name, or an invalid ");
+        Console.WriteLine("exam type (which are parts of the text data file name), ");
+        Console.WriteLine("you will see this error message and be given an ");
+        Console.WriteLine("opportunity to restart the program.");
+
+        Console.WriteLine("\nAlso be aware that this program produces a text file ");
+        Console.WriteLine("(which includes YourName) containing your responses to ");
+        Console.WriteLine("the test questions. Theoretically, your responses ");
+        Console.WriteLine("should be preserved across multiple runs of the program. ");
+        Console.WriteLine("Still you need to check your work, and maybe even re-enter ");
+        Console.WriteLine("some of your responses, because.... No guarantees! ");
+        Console.WriteLine();
+        Useful.enterContinue();
+    }
+
+    //----------
+    private static void dumpReleaseInstructions() {
+        // Useful.clearLine(5);
+        Console.Clear();
+        // Console.ResetColor();
+        Useful.setColors(ConsoleColor.Green,ConsoleColor.Black);
+        Console.WriteLine("You will need to upload your responses file ");
+        Console.WriteLine("("+si.getCourse()+"_"+si.getExamination()+"_"+si.getStudentName()+".txt)");
+        Console.WriteLine("into the final exam dropbox in the Moodle shell for our course."); 
+        Console.WriteLine();
+        Console.WriteLine("It would also be a very good idea for you to keep "); 
+        Console.WriteLine("a backup copy of that file, just in case I encounter "); 
+        Console.WriteLine("problems in processing it. "); 
+        Console.WriteLine();
+        Useful.enterContinue();
+    }
+
+    //----------
+    private static void dumpIterativeDevelopmentMessage() {
         Console.Clear();
         // Console.ResetColor();
         Useful.setColors(ConsoleColor.Green,ConsoleColor.Black);
         for(int ii=0;ii<iterativeDevelopmentMessage.Length;ii++) {
             Console.WriteLine(iterativeDevelopmentMessage[ii]);
         }
-*/
-
         Console.WriteLine();
-
-        return;
-    } // end function Main()
+        Useful.enterContinue();
+    }
 
     //----------
     private static string [] iterativeDevelopmentMessage = {
@@ -96,13 +131,14 @@ Console.WriteLine();
         "    Hello World!",
         "    Goodbye cruel World...",
         "",
-        "and from thence it grew iteratively, step-by-step, over a period of a couple ",
-        "of weeks. At no point did I try to work with any large block of questionably ",
-        "functional code, and I always kept a known-working fallback version of the ",
-        "program so that I could revert to in case some provisional block of code ",
-        "failed miserably. I know it seems slow and tedious, but this approach will ",
-        "save you more time than you can imagine. Debugging a large block of buggy ",
-        "code can take a very long time. ",
+        "and from thence it grew iteratively, step-by-step, over a period of a ",
+        "couple of weeks. At no point did I try to work with any large block of ",
+        "questionably functional code, and I always kept a known-working fallback ",
+        "version of the program so that I could revert to in case some provisional ",
+        "block of code failed miserably. I know it seems slow and tedious, but ",
+        "this approach will save you more time than you can imagine. Debugging a ",
+        "large block of buggy code can take a very long time. The larger the block ",
+        "of buggy code, the longer it is likely to take.",
         "",
         "To those students who felt that we did not do enough actual programming in ",
         "this class, I would encourage you to adjust your notion of what constitutes ",
@@ -110,8 +146,8 @@ Console.WriteLine();
         "",
         "A mature programming process is more about becoming famialiar with ",
         "pre-existing code, reading it and figuring out what it does, documenting it, ",
-        "fixing it (if necessary), organizing it, refactoring it, and synthesizing new ",
-        "solutions than it is about simply writing your own code. ",
+        "fixing it (if necessary), organizing it, refactoring it, and synthesizing ",
+        "new solutions than it is about simply writing your own code. ",
         "",
         "Just because you wrote it does not automatically make it better, ",
         "more familiar perhaps, but that advantage can easily slip away simply by ",
@@ -124,9 +160,9 @@ Console.WriteLine();
         "portfolio of sample programs. You remember that FileStream example program ",
         "that I distributed and discussed during the second week of class? I copied ",
         "that almost verbatim into this program.  Other times I wrote small snippets ",
-        "of original code (I guess you could call them sample programs), working with ",
-        "and debugging them until they performed as needed... and then I incorporated ",
-        "into this examination program.",
+        "of original code (I guess you could call them sample programs), working ",
+        "with and debugging them until they performed as needed... and then I ",
+        "incorporated them into this examination program.",
         "",
         "Eventually, the program grew into a substantial 800+ line application ",
         "program. It's not finished yet. It may never be completely finished, but ",
@@ -838,6 +874,7 @@ class Useful {
         Console.WriteLine();
         Console.Write("Press Enter to continue...");
         Console.ReadLine();
+        Console.WriteLine();
     }
 
     //----------
