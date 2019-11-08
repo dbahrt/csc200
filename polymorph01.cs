@@ -5,12 +5,15 @@
 // AUTHOR: kudvenkat
 // PUB DATE: Jun 9, 2012
 // STUDENT: Dan Bahrt
+// DOWNLOAD: Mar 29, 2019
 // SYNOPSIS: simple object instantiation; no inheritance; no polymorphism
 
 using System;
 
 //==========
 public class Program {
+    
+    //----------
     public static void Main() {
         // using Employee class as a pattern to make an Employee object
         // 1. new operator allocates memory to hold object
@@ -37,6 +40,8 @@ public class Employee {
         Console.WriteLine(FirstName + " " + LastName);
     }
 }
+
+// MODIFICATIONS:  MINIMAL.  added comments.  minor code restructuring.
 
 // ANALYSIS: minimal object-oriented program: instantiate simple object and
 // call member method that gives evidence of execution.
