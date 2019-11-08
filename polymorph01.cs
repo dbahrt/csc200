@@ -1,11 +1,11 @@
-// source: taken from https://www.youtube.com/watch?v=4a_iTOtGhM8 
+// SOURCE: taken from https://www.youtube.com/watch?v=4a_iTOtGhM8 
 //     Part 23 - C# Tutorial - Polymorhpism in c#.avi
-// author: kudvenkat
-// published on Jun 9, 2012
 // Text version of the video at http://csharp-video-tutorials.blogspot.com/...
 //     /2012/06/part-23-c-tutorial-polymorphism.html
-// student: Dan Bahrt
-// synopsis: simple object instantiation; no inheritance; no polymorphism
+// AUTHOR: kudvenkat
+// PUB DATE: Jun 9, 2012
+// STUDENT: Dan Bahrt
+// SYNOPSIS: simple object instantiation; no inheritance; no polymorphism
 
 using System;
 
@@ -19,10 +19,10 @@ public class Program {
         // 4. assignment operator stores ref pointer in variable
         Employee E = new Employee();
         E.PrintFullName(/* hidden parameter: Employee this, */ 10,"name");
-        // 2 main differences between function and method:
+        // 2 main differences between a function and a method:
         // 1. function location is statically determined by compiler.
-        // method is dynamically addressed at runtime, when object is created.
-        // 2. method has a hiddern parameter (this) pointing to the object to
+        // method is dynamically addressed at runtime, after object is created.
+        // 2. method has a hidden parameter (this) pointing to the object to
         // which it belongs
     }
 }
@@ -38,3 +38,6 @@ public class Employee {
     }
 }
 
+// ANALYSIS:
+/* SAMPLE OUTPUT:
+*/
