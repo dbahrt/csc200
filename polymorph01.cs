@@ -38,6 +38,9 @@ public class Employee {
     }
 }
 
-// ANALYSIS:
+// ANALYSIS: minimal object-oriented program: instantiate simple object and
+// call member method that gives evidence of execution.
+
 /* SAMPLE OUTPUT:
+FN LN
 */
